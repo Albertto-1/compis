@@ -2,7 +2,7 @@ import { SymbolTable } from "./SymbolTable";
 import { Tag } from './Tag';
 import fs = require("fs");
 
-export class LexicalAnalizer {
+export class Lexer {
   private buffer: string;
   private index: number = -1;
   private char: string = ' ';
@@ -155,7 +155,7 @@ export class LexicalAnalizer {
     const letter = /^[a-zA-Z]+$/;
     if (str.match(letter)){
       return true;
-    } else{
+    } else {
       return false; 
     }
   }
@@ -165,7 +165,7 @@ export class LexicalAnalizer {
     const letterNumber = /^[0-9a-zA-Z_]+$/;
     if (str.match(letterNumber)){
       return true;
-    } else{
+    } else {
       return false; 
     }
   }
