@@ -1,0 +1,13 @@
+Para correr el proyecto, existen dos posibilidades:
+
+1. Especificar en el archivo main.js el path hacia el documento a analizar dentro de la variable defaultFile.
+
+2. Poner los archivos main.js, lexer.js, SymbolTable.js y Tag.js en la carpeta en donde se encuentren los /Examples/Example[1-8].pas
+	Examples/Example[1-8].pas
+	main.js
+	lexer.js
+	SymbolTable.js
+	Tag.js
+	
+	a. Correr: 	node main.js		Esto correrá el lexer sobre Examples/Example1.pas
+	b. Correr:	node main.js [1-8]	Esto correrá el lexer sobre Examples/Example[1-8].pas
