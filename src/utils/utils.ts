@@ -19,7 +19,8 @@ export interface grammarTable {
 }
 
 interface next {
-  [key: string]: number;
+  head: string,
+  positions: number
 }
 
 export interface Action {

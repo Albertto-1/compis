@@ -1,4 +1,4 @@
-0,programa,4
+0,program,4
 1,program-heading,3
 2,opt-program-parameters,3
 3,opt-program-parameters,0

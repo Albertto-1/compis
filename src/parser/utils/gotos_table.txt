@@ -1,4 +1,4 @@
-0,programa,1
+0,program,1
 0,program-heading,2
 4,program-block,6
 4,constant-declaration-part,7

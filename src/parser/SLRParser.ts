@@ -1,14 +1,18 @@
 import { actionTale, gotosTable, grammarTable, c } from "../utils/utils";
 import { Lexer } from "../lexer/Lexer";
 import fs = require("fs");
+import { Tag } from "../lexer/Tag";
 
 export class SLRParser {
     private actionTable: actionTale = {};
     private gotosTable: gotosTable = {}
     private grammarTable: grammarTable = {}
     private stack: number[] = [0];
-    private symbols: string[] = [];
+    private symbols: string[] = ['$'];
     private lexer: Lexer = new Lexer();
+    private accepted = false;
+    private error = false;
+    private token: any;
 
     constructor(fileName: string) {
         this.lexer.openFile(fileName);
@@ -81,18 +85,75 @@ export class SLRParser {
             const state = +elements[0];
             const input = elements[1];
             const positions = +elements[2];
-            if (this.grammarTable[state]) {
-                this.grammarTable[state][input] = positions;
-            } else {
-                this.grammarTable[state] = {
-                    [input]: positions
-                }
+            this.grammarTable[state] = {
+                head: input,
+                positions
             }
         });
         c('grammarLoaded!');
     }
 
     private start() {
-        
+        this.token = this.lexer.scan();
+        while (this.eval());
+        if (this.accepted) {
+            c('SE ACEPTA');
+        } else if (this.error) {
+            c('Error en la línea ' + this.lexer.line);
+        } else {
+            c('SE RECHAZA');
+        }
+    }
+
+    private eval(): any {
+        c('EVAL');
+        c('token: ' + this.token);
+        if (this.token.tag === Tag.ERROR) {
+            this.error = true;
+            return false;
+        }
+        if (this.token.tag === Tag.EOF) {
+            return false;
+        }
+        if (this.token.tag === Tag.ID) {
+            this.token.value = 'identifier';
+        }
+        if (
+            this.actionTable
+            [this.stack[this.stack.length-1]]
+            [this.token.value]
+        ) {
+            const action = this.actionTable[this.stack[this.stack.length-1]][this.token.value];
+            c('action: ' + JSON.stringify(action));
+            if (action.type === 0) { // ACCEPT
+                this.accepted = true;
+            } else if (action.type === 1) { // SHIFT
+                c('SHIFT---------------------');
+                this.stack.push(action.state);
+                this.symbols.push(this.token.value);
+                c(this.stack.toString() + ' - ' + this.symbols);
+                this.token = this.lexer.scan();
+            } else if (action.type === 2) { // REDUCE
+                c('REDUCE--------------------');
+                const prod = this.grammarTable[action.state];
+                c('prod: ' + JSON.stringify(prod));
+                for (let i = 0; i < prod.positions; i++) {
+                    this.stack.pop();
+                    this.symbols.pop();
+                    c(this.stack.toString() + ' - ' + this.symbols);
+                }
+                this.symbols.push(prod.head);
+                this.stack.push(
+                    this.gotosTable
+                    [this.stack[this.stack.length-1]]
+                    [this.symbols[this.symbols.length-1]]
+                );
+                c(this.stack.toString() + ' - ' + this.symbols);
+            }
+            return true;
+        } else {
+            this.error = true
+            return false;
+        }
     }
 }

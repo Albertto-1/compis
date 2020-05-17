@@ -4,7 +4,7 @@
   "description": "Para correr el proyecto, existen dos posibilidades:",
   "main": "main.js",
   "scripts": {
-    "start": "node ./build/main.js",
+    "start": "npm run build && node ./build/main.js",
     "build": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
