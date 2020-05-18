@@ -4,7 +4,7 @@
   "description": "Para correr el proyecto, existen dos posibilidades:",
   "main": "main.js",
   "scripts": {
-    "start": "node ./build/main.js",
+    "start": "npm run build && node ./build/main.js",
     "build": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^14.0.1",
-    "fs": "0.0.1-security"
+    "fs": "0.0.1-security",
+    "typescript": "^3.9.2"
   }
 }

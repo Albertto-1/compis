@@ -2,11 +2,11 @@ import { SymbolTable } from "./SymbolTable";
 import { Tag } from './Tag';
 import fs = require("fs");
 
-export class LexicalAnalizer {
+export class Lexer {
   private buffer: string;
   private index: number = -1;
   private char: string = ' ';
-  private line: number = 1;
+  line: number = 1;
   symbolTable: SymbolTable;
 
   constructor() {
@@ -23,7 +23,7 @@ export class LexicalAnalizer {
   }
 
   scan() {
-    if(this.char === undefined) {
+    if (this.char === undefined) {
       return this.symbolTable.getOrAddEntry('eof', Tag.EOF);
     }
     while(
@@ -31,15 +31,15 @@ export class LexicalAnalizer {
       this.char === '\t' || 
       this.char === '\n'
     ){
-      if(
+      if (
         this.char === '\n') {
         this.line++;
       }
       this.next();
     }
-    if(!isNaN(+this.char)) {
+    if (!isNaN(+this.char)) {
       return this.analyzeNumber();
-    } else if(this.isLetter(this.char)) {
+    } else if (this.isLetter(this.char)) {
       return this.analyzeString();
     }
     switch (this.char) {
@@ -77,7 +77,7 @@ export class LexicalAnalizer {
   }
   private analyzeLower() {
     this.next();
-    if(this.char === '=') {
+    if (this.char === '=') {
       this.next();
       return this.symbolTable.getOrAddEntry('<=');
     }
@@ -86,7 +86,7 @@ export class LexicalAnalizer {
 
   private analyzeGreater() {
     this.next();
-    if(this.char === '=') {
+    if (this.char === '=') {
       this.next();
       return this.symbolTable.getOrAddEntry('>=');
     }
@@ -95,7 +95,7 @@ export class LexicalAnalizer {
 
   private analyzePoits() {
     this.next();
-    if(this.char === '=') { 
+    if (this.char === '=') { 
       this.next();
       return this.symbolTable.getOrAddEntry(':=');
     }
@@ -119,7 +119,7 @@ export class LexicalAnalizer {
       str = str + this.char;
       this.next();
     } while(this.isAlphanumericOr_(this.char));
-    if(this.symbolTable.isInTable(str)) {
+    if (this.symbolTable.isInTable(str)) {
       if (str.toLowerCase() === 'else') {
         return this.analyzeElse();
       }
@@ -153,9 +153,9 @@ export class LexicalAnalizer {
   private isLetter(str: string){
     if (str === undefined) return false;
     const letter = /^[a-zA-Z]+$/;
-    if(str.match(letter)){
+    if (str.match(letter)){
       return true;
-    } else{
+    } else {
       return false; 
     }
   }
@@ -163,9 +163,9 @@ export class LexicalAnalizer {
   private isAlphanumericOr_(str: string){
     if (str === undefined) return false;
     const letterNumber = /^[0-9a-zA-Z_]+$/;
-    if(str.match(letterNumber)){
+    if (str.match(letterNumber)){
       return true;
-    } else{
+    } else {
       return false; 
     }
   }

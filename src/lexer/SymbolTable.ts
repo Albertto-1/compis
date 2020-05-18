@@ -1,9 +1,6 @@
 import { Tag } from "./Tag";
 import { Entry } from "./Entry";
-
-interface hash {
-  [key: string]: any;
-}
+import { hash } from "../utils/utils";
 
 export class SymbolTable {
   private entries: hash = {};
