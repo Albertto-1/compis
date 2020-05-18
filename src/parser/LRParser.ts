@@ -3,7 +3,7 @@ import { Lexer } from "../lexer/Lexer";
 import fs = require("fs");
 import { Tag } from "../lexer/Tag";
 
-export class SLRParser {
+export class LRParser {
     private actionTable: actionTale = {};
     private gotosTable: gotosTable = {}
     private grammarTable: grammarTable = {}
@@ -47,7 +47,6 @@ export class SLRParser {
                 }
             }
         });
-        c('actionsLoaded!');
     }
 
     private loadGotos() {
@@ -72,7 +71,6 @@ export class SLRParser {
                 }
             }
         });
-        c('gotosLoaded!');
     }
 
     private loadGrammar() {
@@ -90,7 +88,6 @@ export class SLRParser {
                 positions
             }
         });
-        c('grammarLoaded!');
     }
 
     private start() {
@@ -99,15 +96,15 @@ export class SLRParser {
         if (this.accepted) {
             c('SE ACEPTA');
         } else if (this.error) {
-            c('Error en la línea ' + this.lexer.line);
+            c('Error en la línea: ' + this.lexer.line);
         } else {
             c('SE RECHAZA');
         }
     }
 
     private eval(): any {
-        c('EVAL');
-        c('token: ' + this.token);
+        c('----------------------------------------------');
+        c('Evaluando token: "' + this.token.value + '"');
         if (this.token.tag === Tag.ERROR) {
             this.error = true;
             return false;
@@ -120,40 +117,48 @@ export class SLRParser {
         }
         if (
             this.actionTable
-            [this.stack[this.stack.length-1]]
+            [this.stack[this.stack.length - 1]]
             [this.token.value]
         ) {
-            const action = this.actionTable[this.stack[this.stack.length-1]][this.token.value];
-            c('action: ' + JSON.stringify(action));
+            const action = this.actionTable[this.stack[this.stack.length - 1]][this.token.value];
             if (action.type === 0) { // ACCEPT
                 this.accepted = true;
             } else if (action.type === 1) { // SHIFT
-                c('SHIFT---------------------');
+                c('SHIFT: ' + action.state);
                 this.stack.push(action.state);
                 this.symbols.push(this.token.value);
-                c(this.stack.toString() + ' - ' + this.symbols);
                 this.token = this.lexer.scan();
             } else if (action.type === 2) { // REDUCE
-                c('REDUCE--------------------');
+                c('REDUCE: ' + action.state);
                 const prod = this.grammarTable[action.state];
                 c('prod: ' + JSON.stringify(prod));
                 for (let i = 0; i < prod.positions; i++) {
                     this.stack.pop();
                     this.symbols.pop();
-                    c(this.stack.toString() + ' - ' + this.symbols);
+                    this.printStacks();
                 }
                 this.symbols.push(prod.head);
-                this.stack.push(
-                    this.gotosTable
-                    [this.stack[this.stack.length-1]]
-                    [this.symbols[this.symbols.length-1]]
-                );
-                c(this.stack.toString() + ' - ' + this.symbols);
+                if (this.gotosTable[this.stack[this.stack.length - 1]] && this.gotosTable[this.stack[this.stack.length - 1]][this.symbols[this.symbols.length - 1]]) {
+                    this.stack.push(
+                        this.gotosTable
+                        [this.stack[this.stack.length - 1]]
+                        [this.symbols[this.symbols.length - 1]]
+                    );
+                } else {
+                    this.error = true;
+                    return false;
+                }
             }
+            this.printStacks();
             return true;
         } else {
-            this.error = true
+            this.error = true;
             return false;
         }
+    }
+
+    private printStacks() {
+        c('Stack: ' + this.stack);
+        c('Symbols: ' + this.symbols);
     }
 }

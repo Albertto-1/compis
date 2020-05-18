@@ -1,9 +1,9 @@
-import { SLRParser } from "./parser/SLRParser";
+import { LRParser } from "./parser/LRParser";
 
 let fileName = 'Examples/Example';
 if (process.argv[2] !== undefined) {
   fileName += process.argv[2] + '.pas';
 } else {
-  fileName += '1.pas';
+  fileName += '.pas';
 }
-const slr = new SLRParser(fileName);
+const lr = new LRParser(fileName);
